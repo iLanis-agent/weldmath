@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WeldMath</title>
+<style>
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:-apple-system,'Segoe UI',Roboto,sans-serif; background:#0d1117; color:#e6edf3; }
+  .wrap { max-width:720px; margin:0 auto; padding:36px 20px 60px; }
+  h1 { font-size:1.9rem; margin:0; }
+  .tag { color:#9da7b3; margin:6px 0 18px; }
+  .presets { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:22px; }
+  .presets button { background:#21262d; color:#c9d1d9; border:1px solid #30363d; border-radius:999px; padding:8px 16px; font-size:0.9rem; cursor:pointer; }
+  .presets button:hover { border-color:#f0883e; color:#f0883e; }
+  section { background:#161b22; border:1px solid #30363d; border-radius:12px; padding:20px; margin-bottom:18px; }
+  h2 { font-size:1rem; margin:0 0 14px; color:#e6edf3; }
+  .row { display:flex; flex-wrap:wrap; gap:14px; margin-bottom:14px; }
+  label { display:block; font-size:0.78rem; color:#9da7b3; margin-bottom:4px; }
+  input, select { background:#0d1117; border:1px solid #30363d; color:#e6edf3; border-radius:6px; padding:8px 10px; font-size:0.95rem; width:130px; }
+  .outs { display:flex; flex-wrap:wrap; gap:12px; }
+  .out { flex:1 1 200px; background:#0d1117; border:1px solid #21262d; border-radius:8px; padding:12px 14px; }
+  .out .val { font-size:1.15rem; font-weight:700; color:#58a6ff; }
+  .out .lab { font-size:0.75rem; color:#9da7b3; margin-top:4px; }
+  .foot { color:#6e7681; font-size:0.8rem; margin-top:10px; }
+  a { color:#58a6ff; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>&#128293; WeldMath</h1>
+  <p class="tag">Welding setup math - the chart on the shop wall, without the shop wall.</p>
+  <div class="presets">
+    <button data-p="gate">Fix a gate</button>
+    <button data-p="exhaust">Exhaust patch</button>
+    <button data-p="bike">Bike frame</button>
+    <button data-p="boat">Aluminum boat</button>
+  </div>
+
+  <section>
+    <h2>1. Amperage</h2>
+    <div class="row">
+      <div><label>Process</label>
+        <select id="proc"><option value="stick">Stick (SMAW)</option><option value="mig">MIG (GMAW)</option><option value="tig">TIG (GTAW)</option></select></div>
+      <div><label>Material</label>
+        <select id="mat"><option value="mild">Mild steel</option><option value="stainless">Stainless</option><option value="aluminum">Aluminum</option></select></div>
+      <div><label>Thickness (mm)</label><input id="thk" type="number" step="0.1" min="0.2" value="4"></div>
+    </div>
+    <div class="outs">
+      <div class="out"><div class="val" id="o-amps"></div><div class="lab">Current estimate</div></div>
+      <div class="out"><div class="val" id="o-ampsnote"></div><div class="lab">Note</div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>2. Consumable</h2>
+    <div class="row">
+      <div><label>MIG wire (mm)</label>
+        <select id="wire"><option value="0.8">0.8</option><option value="0.9">0.9</option><option value="1.2">1.2</option></select></div>
+    </div>
+    <div class="outs">
+      <div class="out"><div class="val" id="o-consumable"></div><div class="lab">Electrode / wire</div></div>
+      <div class="out"><div class="val" id="o-consnote"></div><div class="lab">Settings</div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>3. Heat input</h2>
+    <div class="row">
+      <div><label>Voltage (V)</label><input id="hv" type="number" step="0.5" value="18"></div>
+      <div><label>Current (A)</label><input id="hi" type="number" step="5" value="140"></div>
+      <div><label>Travel (mm/min)</label><input id="hs" type="number" step="10" value="200"></div>
+    </div>
+    <div class="outs">
+      <div class="out"><div class="val" id="o-heat"></div><div class="lab">Heat input</div></div>
+      <div class="out"><div class="val" id="o-heatnote"></div><div class="lab">Verdict</div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>4. Preheat (carbon equivalent)</h2>
+    <div class="row">
+      <div><label>C %</label><input id="c-c" type="number" step="0.01" value="0.26"></div>
+      <div><label>Mn %</label><input id="c-mn" type="number" step="0.01" value="0.9"></div>
+      <div><label>Cr %</label><input id="c-cr" type="number" step="0.01" value="0"></div>
+      <div><label>Mo %</label><input id="c-mo" type="number" step="0.01" value="0"></div>
+      <div><label>V %</label><input id="c-v" type="number" step="0.01" value="0"></div>
+      <div><label>Ni %</label><input id="c-ni" type="number" step="0.01" value="0.05"></div>
+      <div><label>Cu %</label><input id="c-cu" type="number" step="0.01" value="0.02"></div>
+      <div><label>Thick (mm)</label><input id="c-thk" type="number" step="1" value="10"></div>
+    </div>
+    <div class="outs">
+      <div class="out"><div class="val" id="o-preheat"></div><div class="lab">Preheat</div></div>
+      <div class="out"><div class="val" id="o-ce"></div><div class="lab">Carbon equivalent (IIW)</div></div>
+    </div>
+  </section>
+
+  <p class="foot">Estimates, not a WPS - dial markings, joint geometry, position, and gas choice all move the real numbers. <a href="index.html">About</a> &middot; <a href="https://github.com/iLanis-agent/weldmath">Code</a></p>
+</div>
+<script src="engine.js"></script>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var num = function (id) { var v = parseFloat($(id).value); return isNaN(v) ? 0 : v; };
+
+  var PRESETS = {
+    gate:    { proc:'stick', mat:'mild', thk:4,   wire:'0.8', hv:18,   hi:140, hs:200, chem:[0.26,0.9,0,0,0,0.05,0.02], cthk:10 },
+    exhaust: { proc:'mig',   mat:'mild', thk:1.2, wire:'0.8', hv:17,   hi:50,  hs:300, chem:[0.08,0.4,0,0,0,0,0],       cthk:2  },
+    bike:    { proc:'tig',   mat:'mild', thk:1.5, wire:'0.9', hv:11,   hi:60,  hs:120, chem:[0.30,0.5,1.0,0.2,0,0,0],  cthk:3  },
+    boat:    { proc:'tig',   mat:'aluminum', thk:3, wire:'0.9', hv:13, hi:140, hs:180, chem:[0,0,0,0,0,0,0],           cthk:3  }
+  };
+
+  function compute() {
+    var proc = $('proc').value, mat = $('mat').value, thk = num('thk');
+    var amps = WeldMath.ampsFor(thk, mat, proc);
+    $('o-amps').textContent = amps + ' A';
+    var note;
+    if (proc === 'stick') {
+      var rod = WeldMath.rodFor(thk);
+      note = amps > rod.high ? 'above the ' + rod.size + ' rod range - bigger rod or multiple passes'
+        : 'inside the ' + rod.size + ' rod range (' + rod.low + '-' + rod.high + ' A)';
+    } else if (proc === 'mig') {
+      note = 'short-circuit transfer up to ~180 A; spray above';
+    } else {
+      note = mat === 'aluminum' ? 'AC with cleaning action; pure tungsten or lanthanated' : 'DCEN, sharp tungsten, gas lens helps';
+    }
+    $('o-ampsnote').textContent = note;
+
+    if (proc === 'stick') {
+      var r = WeldMath.rodFor(thk);
+      $('o-consumable').textContent = r.size + ' rod';
+      $('o-consnote').textContent = r.low + '-' + r.high + ' A - E7018 for structure, E6013 for sheet, E6010 for root';
+    } else if (proc === 'mig') {
+      var dia = $('wire').value;
+      $('o-consumable').textContent = dia + ' mm wire';
+      $('o-consnote').textContent = '~' + WeldMath.wireSpeed(amps, dia) + ' ipm at ' + WeldMath.migVolts(thk) + ' V';
+    } else {
+      $('o-consumable').textContent = thk <= 1.6 ? '1.6 mm filler' : '2.4 mm filler';
+      $('o-consnote').textContent = 'argon 6-10 l/min; filler matches base metal family';
+    }
+
+    var h = WeldMath.heatInput(num('hv'), num('hi'), num('hs'));
+    $('o-heat').textContent = h + ' kJ/mm';
+    $('o-heatnote').textContent = WeldMath.heatVerdict(h);
+
+    var ce = WeldMath.carbonEquivalent(num('c-c'), num('c-mn'), num('c-cr'), num('c-mo'), num('c-v'), num('c-ni'), num('c-cu'));
+    $('o-ce').textContent = 'CE ' + ce.toFixed(3);
+    $('o-preheat').textContent = WeldMath.preheatFor(ce, num('c-thk'));
+  }
+
+  function apply(p) {
+    $('proc').value = p.proc; $('mat').value = p.mat; $('thk').value = p.thk;
+    $('wire').value = p.wire;
+    $('hv').value = p.hv; $('hi').value = p.hi; $('hs').value = p.hs;
+    var ids = ['c-c','c-mn','c-cr','c-mo','c-v','c-ni','c-cu'];
+    ids.forEach(function (id, i) { $(id).value = p.chem[i]; });
+    $('c-thk').value = p.cthk;
+    compute();
+  }
+
+  document.querySelectorAll('.presets button').forEach(function (b) {
+    b.addEventListener('click', function () { apply(PRESETS[b.getAttribute('data-p')]); });
+  });
+  document.querySelectorAll('input, select').forEach(function (el) {
+    el.addEventListener('input', compute);
+    el.addEventListener('change', compute);
+  });
+  apply(PRESETS.gate);
+}());
+</script>
+</body>
+</html>
